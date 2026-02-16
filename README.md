@@ -17,4 +17,7 @@ Si estás luchando contra algunos conceptos de matemáticas o físicas en el des
 Cualquier comentario para mejorar el código será bienvenido.
 
 ---
+Lesson 5 - Steering Behaviour
 ![Steering Behavior - Separate and Seek](graphics/gifs/lesson5-mixing_behaviors.gif)
+Lesson 7 - Cellular Automata
+![Celullar Automata - Wolfram Rules](graphics/gifs/lesson7-wolfram-rules.gif)
