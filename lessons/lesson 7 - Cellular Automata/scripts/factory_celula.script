@@ -1,10 +1,12 @@
 -- 0: blanco
 -- 1: negro
+-- Probar otras reglas de Wolfram con la página oficial https://mathworld.wolfram.com/ElementaryCellularAutomaton.html 
 
 local tam_celula = 10
 local celulas = {}
 local regla_wolfram = 22
 local regla_wolfram_bin = ""
+local retraso = 0.1
 
 local function calcular_nuevo_estado(a, b, c)
 	local regla_automata = tonumber(a..b..c, 2)
@@ -17,30 +19,32 @@ local function armar_celulas(self)
 		celulas[i] = 0
 	end
 	celulas[math.floor(self.columnas/2)] = 1
-	
+	pprint("filas: "..self.filas)
 	for j = 1, self.filas do
+		timer.delay(retraso*j, false, function()
+			print("dentro del timer")
+			local pos = vmath.vector3((tam_celula/2),self.alto - (tam_celula/2),0)
+			for index, value in ipairs(celulas) do
+				local margen = vmath.vector3((index-1)*tam_celula, (j-1)*tam_celula*-1, 0)
+				local celula = factory.create("#factory", pos + margen)
+				local url = msg.url(nil, celula, "sprite")
+				local color = math.abs(0.8 - value)
+				go.set(url, "tint", vmath.vector4(color, color, color, 1))
+				go.set(url, "size", vmath.vector3(tam_celula, tam_celula, 0))
+			end
 
-		local pos = vmath.vector3((tam_celula/2),self.alto - (tam_celula/2),0)
-		for index, value in ipairs(celulas) do
-			local margen = vmath.vector3((index-1)*tam_celula, (j-1)*tam_celula*-1, 0)
-			local celula = factory.create("#factory", pos + margen)
-			local url = msg.url(nil, celula, "sprite")
-			local color = math.abs(0.8 - value)
-			go.set(url, "tint", vmath.vector4(color, color, color, 1))
-			go.set(url, "size", vmath.vector3(tam_celula, tam_celula, 0))
-		end
-
-		local nuevas_celulas = {}
-		nuevas_celulas[1] = celulas[1]
-		nuevas_celulas[#celulas] = celulas[#celulas]
-		for i = 2, #celulas-1 do
-			local izquierda = celulas[i-1]
-			local derecha = celulas[i+1]
-			local estado = celulas[i]
-			local nuevo_estado = calcular_nuevo_estado(izquierda, estado, derecha)
-			nuevas_celulas[i] = nuevo_estado
-		end
-		celulas = nuevas_celulas
+			local nuevas_celulas = {}
+			nuevas_celulas[1] = celulas[1]
+			nuevas_celulas[#celulas] = celulas[#celulas]
+			for i = 2, #celulas-1 do
+				local izquierda = celulas[i-1]
+				local derecha = celulas[i+1]
+				local estado = celulas[i]
+				local nuevo_estado = calcular_nuevo_estado(izquierda, estado, derecha)
+				nuevas_celulas[i] = nuevo_estado
+			end
+			celulas = nuevas_celulas
+		end)
 	end
 
 end
@@ -59,12 +63,12 @@ end
 
 function init(self)
 	math.randomseed(os.clock())
-	local w, h = window.get_size()
+	local w, h = 960, 640
 	self.ancho = w
 	self.alto = h
 	self.filas = h / tam_celula
 	self.columnas = w / tam_celula
 	convertir_regla_a_bin()
-	armar_celulas(self)
+	timer.delay(3, false, armar_celulas)
 end
 
